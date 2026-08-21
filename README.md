@@ -23,6 +23,7 @@ dataset 后，通过明确的端口和适配器接入。
 - [产品愿景](docs/product-vision.md)：使命、边界、原则和决策过滤器；
 - [架构原则](docs/architecture.md)：Core、Runtime、Skill、Agent 与 Verifier 的职责；
 - [路线图](docs/roadmap.md)：按可验收里程碑推进，而不是按功能清单堆叠；
+- [授权说明](docs/licensing.md)：AGPL 与商业许可证双重授权模式；
 - [贡献指南](CONTRIBUTING.md)：开发环境、质量要求和变更约束；
 - [架构决策记录](docs/decisions/README.md)：记录重要且长期生效的技术决策。
 
@@ -76,3 +77,13 @@ irm https://astral.sh/uv/install.ps1 | iex
 
 运行产物放在 `artifacts/` 或 `workspace/`，两者均不进入版本控制。不要把原始 PDF、
 模型权重、OCR 缓存或用户文档复制到源码目录。
+
+## 许可证
+
+MathLens 采用双重授权：
+
+- [GNU Affero General Public License v3.0 only](LICENSE)；或
+- 由版权所有者张国人（Guoren Zhang）单独书面授予的[商业许可证](COMMERCIAL-LICENSE.md)。
+
+闭源集成、私有修改、白标、OEM 及其他商业授权需求，请联系
+[2245924824@qq.com](mailto:2245924824@qq.com)。详细说明见[授权文档](docs/licensing.md)。

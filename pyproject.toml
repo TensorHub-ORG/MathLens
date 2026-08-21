@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=69"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,13 +8,19 @@ version = "0.1.0"
 description = "A verifiable workflow core for mathematical document parsing and reasoning."
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
-license = { text = "Proprietary" }
-authors = [{ name = "MathLens contributors" }]
+license = "AGPL-3.0-only"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Guoren Zhang", email = "2245924824@qq.com" }]
 dependencies = [
   "pydantic>=2.8,<3",
   "pymupdf>=1.24,<2",
   "typer>=0.12,<1",
 ]
+
+[project.urls]
+Homepage = "https://github.com/TensorHub-ORG/MathLens"
+Documentation = "https://github.com/TensorHub-ORG/MathLens/tree/main/docs"
+Issues = "https://github.com/TensorHub-ORG/MathLens/issues"
 
 [dependency-groups]
 dev = [
