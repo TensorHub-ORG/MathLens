@@ -1,0 +1,72 @@
+{
+  "schema": "mathlens.golden-dataset.v1",
+  "dataset_id": "high-algebra-2022-2024-seed",
+  "source": {
+    "filename": "2022-2024各高校高等代数真题汇总.pdf",
+    "sha256": "447ae6c65dfbdbfc391dc028b18d3c93c729e2b6012e163891cffea68e18a893"
+  },
+  "source_page_count": 207,
+  "render_dpi": 300,
+  "pages": [
+    {
+      "page_number": 1,
+      "strata": ["目录", "密集文本", "点引导线", "页码"],
+      "rationale": "检验目录结构、长行阅读顺序以及条目末尾页码。"
+    },
+    {
+      "page_number": 7,
+      "strata": ["完整试卷", "密集公式", "矩阵", "水印"],
+      "rationale": "正文密集，包含块矩阵、根式、上下标、证明题与斜向水印。"
+    },
+    {
+      "page_number": 12,
+      "strata": ["跨试卷边界", "矩阵", "填空题", "分节标题"],
+      "rationale": "同页结束一份试卷并开始下一份，适合评测文档结构切分。"
+    },
+    {
+      "page_number": 30,
+      "strata": ["大型行列式", "证明题", "长公式", "水印"],
+      "rationale": "包含高阶符号行列式和多级题号，容易出现阅读顺序与公式边界错误。"
+    },
+    {
+      "page_number": 50,
+      "strata": ["跨试卷边界", "块矩阵", "二次型", "判断题"],
+      "rationale": "上下半页属于不同试卷，并混合矩阵、转置和题型标题。"
+    },
+    {
+      "page_number": 70,
+      "strata": ["跨试卷边界", "大型行列式", "求和符号", "方程"],
+      "rationale": "包含 Vandermonde 型行列式、双重求和以及试卷标题切换。"
+    },
+    {
+      "page_number": 90,
+      "strata": ["集合记号", "大型矩阵", "Jordan", "长证明"],
+      "rationale": "数学符号类型丰富，页面底部有五阶矩阵和 Jordan 标准形任务。"
+    },
+    {
+      "page_number": 110,
+      "strata": ["分段公式", "循环矩阵", "方程组", "跨试卷边界"],
+      "rationale": "覆盖 cases 结构、大矩阵、列向量与新试卷标题。"
+    },
+    {
+      "page_number": 130,
+      "strata": ["方程组", "行列式", "Jordan 块", "水印"],
+      "rationale": "多种大型公式纵向排列，适合评测版面块与公式定位。"
+    },
+    {
+      "page_number": 150,
+      "strata": ["高密度页面", "多项式", "矩阵", "二次型"],
+      "rationale": "公式与正文密度高，包含多种矩阵尺寸和抽象代数记号。"
+    },
+    {
+      "page_number": 170,
+      "strata": ["并排方程组", "行列式", "商空间", "长公式"],
+      "rationale": "同一题内存在并排方程组，是阅读顺序和块切分的高风险样本。"
+    },
+    {
+      "page_number": 207,
+      "strata": ["稀疏页面", "页尾", "多个矩阵", "大留白"],
+      "rationale": "最后一页下半部大面积留白，可检验误检率和页尾结构。"
+    }
+  ]
+}

@@ -25,6 +25,12 @@
 
 状态：进行中
 
+阶段进度：
+
+- M1-A 页面渲染与 artifact：已完成；
+- M1-B 代表页选择、Golden Schema 与评测器：基础设施已完成，12 页人工标注待进行；
+- M1-C MinerU Adapter：3.4.5 单页真实闭环已完成，完整 baseline 等待 Golden 复核。
+
 范围：
 
 - 页面高分辨率渲染；

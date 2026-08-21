@@ -24,6 +24,7 @@
 
 - [0001：稳定核心与 Skill 边界](0001-stable-core-and-skills.md)
 - [0002：内容寻址的页面图 Artifact](0002-content-addressed-page-artifacts.md)
+- [0003：Golden 评测与 MinerU 接入边界](0003-golden-evaluation-and-mineru-boundary.md)
 
 ## 模板
 

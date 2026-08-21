@@ -16,7 +16,7 @@ def test_doctor_reports_runtime_and_external_tools() -> None:
     report = json.loads(result.stdout)
     assert report["mathlens"] == "0.1.0"
     assert report["pymupdf"]
-    assert set(report["tools"]) == {"pdfinfo", "pdftoppm", "xelatex", "latexmk"}
+    assert set(report["tools"]) == {"pdfinfo", "pdftoppm", "xelatex", "latexmk", "mineru"}
 
 
 def test_inspect_writes_document_profile(tmp_path: Path) -> None:
@@ -71,3 +71,42 @@ def test_evaluate_writes_report(tmp_path: Path) -> None:
     report = json.loads(output.read_text(encoding="utf-8"))
     assert report["results"][0]["exact_match"] is False
     assert report["results"][0]["edit_distance"] == 1
+
+
+def test_golden_validate_reports_seed_selection() -> None:
+    result = runner.invoke(
+        app,
+        ["golden-validate", "benchmarks/high-algebra-2022-2024/selection.json"],
+    )
+
+    assert result.exit_code == 0
+    report = json.loads(result.stdout)
+    assert report["selected_pages"] == 12
+    assert report["status_counts"]["selected"] == 12
+
+
+def test_mineru_import_writes_mathir_result(tmp_path: Path) -> None:
+    source = tmp_path / "source.pdf"
+    output = tmp_path / "parse-result.json"
+    document = pymupdf.open()
+    document.new_page()
+    document.save(source)
+    document.close()
+
+    result = runner.invoke(
+        app,
+        [
+            "mineru-import",
+            "tests/fixtures/mineru_content_list_v2.json",
+            str(source),
+            "--output",
+            str(output),
+            "--engine-version",
+            "3.0.0",
+        ],
+    )
+
+    assert result.exit_code == 0
+    report = json.loads(output.read_text(encoding="utf-8"))
+    assert report["engine"] == "mineru"
+    assert report["document"]["pages"][0]["blocks"][2]["type"] == "formula"

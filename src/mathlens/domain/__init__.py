@@ -13,6 +13,11 @@ from mathlens.domain.document import (
     Document,
     Page,
 )
+from mathlens.domain.parsing import (
+    DiagnosticLevel,
+    DocumentParseResult,
+    ParseDiagnostic,
+)
 
 __all__ = [
     "Block",
@@ -21,9 +26,12 @@ __all__ = [
     "ContentCandidate",
     "CoordinateSpace",
     "CoordinateTransform",
+    "DiagnosticLevel",
     "Document",
+    "DocumentParseResult",
     "Page",
     "PageImageArtifactManifest",
     "PageImageMetadata",
+    "ParseDiagnostic",
     "SourceDocument",
 ]

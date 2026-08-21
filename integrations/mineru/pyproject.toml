@@ -1,0 +1,13 @@
+[project]
+name = "mathlens-mineru-runtime"
+version = "0.1.0"
+description = "Isolated MinerU runtime for the MathLens MinerU adapter."
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "mineru[pipeline]==3.4.5",
+  # MinerU 3.4.5 imports six in its pipeline OCR path but does not declare it.
+  "six>=1.17,<2",
+]
+
+[tool.uv]
+package = false

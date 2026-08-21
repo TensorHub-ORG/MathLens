@@ -1,0 +1,38 @@
+[
+  [
+    {
+      "type": "title",
+      "content": {
+        "title_content": [
+          {"type": "text", "content": "高等代数试卷"}
+        ],
+        "level": 1
+      },
+      "bbox": [100, 50, 900, 120]
+    },
+    {
+      "type": "paragraph",
+      "content": {
+        "paragraph_content": [
+          {"type": "text", "content": "设矩阵 "},
+          {"type": "inline_equation", "content": "A"}
+        ]
+      },
+      "bbox": [100, 150, 900, 230]
+    },
+    {
+      "type": "equation_interline",
+      "content": {
+        "math_content": "\\det(A-\\lambda I)=0",
+        "math_type": "latex"
+      },
+      "bbox": [250, 260, 750, 340]
+    },
+    {
+      "type": "paragraph",
+      "content": {
+        "paragraph_content": [{"type": "text", "content": "缺少定位"}]
+      }
+    }
+  ]
+]

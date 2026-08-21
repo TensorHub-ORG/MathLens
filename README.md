@@ -25,6 +25,8 @@ dataset 后，通过明确的端口和适配器接入。
 - [产品愿景](docs/product-vision.md)：使命、边界、原则和决策过滤器；
 - [架构原则](docs/architecture.md)：Core、Runtime、Skill、Agent 与 Verifier 的职责；
 - [路线图](docs/roadmap.md)：按可验收里程碑推进，而不是按功能清单堆叠；
+- [Golden Dataset](docs/golden-datasets.md)：代表页面、标注 Schema 与解析指标；
+- [MinerU Adapter](docs/mineru.md)：独立运行时、导入与执行方式；
 - [授权说明](docs/licensing.md)：AGPL 与商业许可证双重授权模式；
 - [贡献指南](CONTRIBUTING.md)：开发环境、质量要求和变更约束；
 - [架构决策记录](docs/decisions/README.md)：记录重要且长期生效的技术决策。
