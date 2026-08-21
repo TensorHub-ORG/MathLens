@@ -1,0 +1,3 @@
+{"id":"text-001","kind":"text","reference":"设 A 为矩阵","prediction":"设 A 为矩阵"}
+{"id":"formula-001","kind":"formula","reference":"\\det(A-\\lambda I)=0","prediction":"\\det(A - \\lambda I) = 0"}
+{"id":"formula-002","kind":"formula","reference":"A^T A","prediction":"A^7 A"}

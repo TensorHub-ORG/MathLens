@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mathlens"
+version = "0.1.0"
+description = "A verifiable workflow core for mathematical document parsing and reasoning."
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+license = { text = "Proprietary" }
+authors = [{ name = "MathLens contributors" }]
+dependencies = [
+  "pydantic>=2.8,<3",
+  "pymupdf>=1.24,<2",
+  "typer>=0.12,<1",
+]
+
+[dependency-groups]
+dev = [
+  "mypy>=1.11,<2",
+  "pytest>=8.3,<9",
+  "pytest-cov>=5,<7",
+  "ruff>=0.6,<1",
+]
+
+[project.scripts]
+mathlens = "mathlens.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+mathlens = ["py.typed"]
+
+[tool.pytest.ini_options]
+addopts = "-q --strict-config --strict-markers"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["mathlens"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".uv-cache"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["mathlens"]
