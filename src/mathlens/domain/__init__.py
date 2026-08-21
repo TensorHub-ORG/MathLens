@@ -1,3 +1,9 @@
+from mathlens.domain.artifacts import (
+    CoordinateTransform,
+    PageImageArtifactManifest,
+    PageImageMetadata,
+    SourceDocument,
+)
 from mathlens.domain.document import (
     Block,
     BlockType,
@@ -14,6 +20,10 @@ __all__ = [
     "BoundingBox",
     "ContentCandidate",
     "CoordinateSpace",
+    "CoordinateTransform",
     "Document",
     "Page",
+    "PageImageArtifactManifest",
+    "PageImageMetadata",
+    "SourceDocument",
 ]

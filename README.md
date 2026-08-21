@@ -10,6 +10,8 @@ MathLens 是一个面向数学文档的开放、可验证、可扩展的智能�
 
 - 数学文档中间表示 MathIR；
 - 基于 PyMuPDF 的只读 PDF 探测；
+- 基于 PyMuPDF 的高分辨率页面渲染；
+- 内容寻址、可复现且带坐标映射的页面 artifact；
 - 带引擎、版本和置信度的内容候选；
 - 文本字符错误率和保守的公式精确匹配评测；
 - 可作为未来 Tauri sidecar 使用的 CLI；
@@ -53,6 +55,16 @@ irm https://astral.sh/uv/install.ps1 | iex
 ```powershell
 .tools\uv run mathlens inspect "path\to\document.pdf" --max-pages 10
 ```
+
+将指定页面以 300 DPI 渲染为不可变 artifact：
+
+```powershell
+.tools\uv run mathlens render "path\to\document.pdf" --page 1 --page 4 --output-dir artifacts
+```
+
+每个页面写入以 artifact ID 寻址的独立目录，其中包含 `page.png` 和 `manifest.json`。
+manifest 记录源文件哈希、页码、DPI、像素尺寸、PDF 点坐标到像素坐标的映射、引擎版本
+和配置哈希。省略 `--page` 时渲染全部页面；大型文档建议显式选择页面。
 
 运行 JSONL golden dataset 评测：
 

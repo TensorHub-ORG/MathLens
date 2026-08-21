@@ -23,6 +23,7 @@
 ## 已有决策
 
 - [0001：稳定核心与 Skill 边界](0001-stable-core-and-skills.md)
+- [0002：内容寻址的页面图 Artifact](0002-content-addressed-page-artifacts.md)
 
 ## 模板
 

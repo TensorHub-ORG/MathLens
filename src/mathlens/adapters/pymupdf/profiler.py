@@ -1,19 +1,11 @@
 from __future__ import annotations
 
-import hashlib
 from pathlib import Path
 
 import pymupdf
 
 from mathlens.domain.profile import DocumentProfile, PageKind, PageProfile
-
-
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+from mathlens.hashing import sha256_file
 
 
 def _classify_page(text_characters: int, images: int, drawings: int) -> PageKind:
@@ -62,7 +54,7 @@ class PyMuPDFProfiler:
 
             return DocumentProfile(
                 source_path=source,
-                source_sha256=_sha256(source),
+                source_sha256=sha256_file(source),
                 file_size_bytes=source.stat().st_size,
                 page_count=document.page_count,
                 inspected_pages=tuple(pages),

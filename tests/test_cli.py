@@ -36,6 +36,27 @@ def test_inspect_writes_document_profile(tmp_path: Path) -> None:
     assert report["inspected_pages"][0]["kind"] == "vector"
 
 
+def test_render_writes_selected_page_artifact(tmp_path: Path) -> None:
+    source = tmp_path / "source.pdf"
+    output = tmp_path / "artifacts"
+    document = pymupdf.open()
+    document.new_page()
+    document.new_page()
+    document.save(source)
+    document.close()
+
+    result = runner.invoke(
+        app,
+        ["render", str(source), "--page", "2", "--dpi", "144", "--output-dir", str(output)],
+    )
+
+    assert result.exit_code == 0
+    report = json.loads(result.stdout)
+    assert len(report["artifacts"]) == 1
+    assert report["artifacts"][0]["manifest"]["page"]["page_number"] == 2
+    assert Path(report["artifacts"][0]["image_path"]).is_file()
+
+
 def test_evaluate_writes_report(tmp_path: Path) -> None:
     dataset = tmp_path / "evaluation.jsonl"
     output = tmp_path / "report.json"

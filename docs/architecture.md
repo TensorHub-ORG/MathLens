@@ -83,6 +83,9 @@ diagnostics
 大型二进制内容保存在 artifact store，工作流只传递引用。用户源文件、模型缓存和运行产物
 不进入源码仓库。
 
+页面渲染 artifact 的寻址、隐私和坐标约定见
+[ADR-0002](decisions/0002-content-addressed-page-artifacts.md)。
+
 ## 工作流原则
 
 - 确定性操作优先使用普通 Node；
