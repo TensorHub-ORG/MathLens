@@ -1,0 +1,27 @@
+{
+  "name": "@mathlens/golden-workbench",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && vite build --configLoader native",
+    "dev": "vite --configLoader native",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit --pretty false"
+  },
+  "dependencies": {
+    "katex": "^0.18.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/katex": "^0.16.8",
+    "@types/node": "^26.2.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@vitejs/plugin-react": "6.1.0",
+    "typescript": "7.0.2",
+    "vite": "8.2.2"
+  }
+}

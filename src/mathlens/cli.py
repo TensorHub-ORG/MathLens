@@ -15,14 +15,27 @@ from mathlens.adapters.filesystem import FileSystemPageArtifactStore
 from mathlens.adapters.mineru import (
     MinerUBackend,
     MinerUCLIAdapter,
+    MinerUDevice,
     MinerUMethod,
     import_content_list_v2,
+    probe_mineru_runtime,
 )
 from mathlens.adapters.pymupdf import PyMuPDFPageRenderer, PyMuPDFProfiler
-from mathlens.application import prepare_golden_dataset, render_document
+from mathlens.application import (
+    prepare_golden_dataset,
+    prepare_parsing_evaluation,
+    render_document,
+)
 from mathlens.domain import DocumentParseResult
-from mathlens.evaluation import EvaluationSample, evaluate_parsing, evaluate_samples
-from mathlens.golden import GoldenDataset
+from mathlens.evaluation import (
+    EvaluationSample,
+    ParsingPredictionSource,
+    evaluate_parsing,
+    evaluate_samples,
+)
+from mathlens.golden import GoldenDataset, ReviewAspect
+from mathlens.studio import GoldenWorkspace
+from mathlens.studio.server import serve_studio
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_enable=False)
 
@@ -44,6 +57,18 @@ def doctor() -> None:
         "tools": {name: shutil.which(name) for name in tools},
     }
     typer.echo(json.dumps(report, ensure_ascii=False, indent=2))
+
+
+@app.command("mineru-doctor")
+def doctor_mineru(
+    executable: Annotated[str, typer.Option()] = "mineru",
+) -> None:
+    """Inspect the isolated MinerU runtime and its CUDA visibility."""
+    try:
+        runtime = probe_mineru_runtime(executable)
+    except (FileNotFoundError, RuntimeError) as error:
+        raise typer.BadParameter(str(error)) from error
+    typer.echo(json.dumps(runtime.as_dict(), ensure_ascii=False, indent=2))
 
 
 @app.command("golden-prepare")
@@ -150,9 +175,15 @@ def validate_golden_dataset(
         "source_sha256": golden.source.sha256,
         "selected_pages": len(golden.pages),
         "page_numbers": [page.page_number for page in golden.pages],
-        "status_counts": {
-            status.value: sum(page.status is status for page in golden.pages)
-            for status in type(golden.pages[0].status)
+        "verified_page_aspect_counts": {
+            aspect.value: sum(aspect in page.verified_aspects for page in golden.pages)
+            for aspect in (ReviewAspect.LAYOUT, ReviewAspect.READING_ORDER)
+        },
+        "verified_content_blocks": {
+            aspect.value: sum(
+                aspect in block.verified_aspects for page in golden.pages for block in page.blocks
+            )
+            for aspect in (ReviewAspect.TRANSCRIPTION, ReviewAspect.FORMULA)
         },
     }
     typer.echo(json.dumps(report, ensure_ascii=False, indent=2))
@@ -161,15 +192,41 @@ def validate_golden_dataset(
 @app.command("evaluate-parsing")
 def evaluate_parsing_output(
     reference: Annotated[Path, typer.Argument(exists=True, file_okay=True, dir_okay=False)],
-    prediction: Annotated[Path, typer.Argument(exists=True, file_okay=True, dir_okay=False)],
+    prediction: Annotated[list[Path], typer.Argument(exists=True, file_okay=True, dir_okay=False)],
     output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
     iou_threshold: Annotated[float, typer.Option(min=0.01, max=1.0)] = 0.5,
+    verified_only: Annotated[bool, typer.Option("--verified-only")] = False,
 ) -> None:
-    """Evaluate MathIR parser output against a reviewed golden dataset."""
+    """Evaluate one or more MathIR parser outputs against a golden dataset."""
     try:
         golden = GoldenDataset.model_validate_json(reference.read_text(encoding="utf-8"))
-        parsed = DocumentParseResult.model_validate_json(prediction.read_text(encoding="utf-8"))
-        report = evaluate_parsing(golden, parsed.document, iou_threshold=iou_threshold)
+        parsed = tuple(
+            DocumentParseResult.model_validate_json(path.read_text(encoding="utf-8"))
+            for path in prediction
+        )
+        selected_golden, merged_prediction = prepare_parsing_evaluation(
+            golden,
+            parsed,
+            verified_only=verified_only,
+        )
+        report = evaluate_parsing(
+            selected_golden,
+            merged_prediction,
+            iou_threshold=iou_threshold,
+        )
+        report = report.model_copy(
+            update={
+                "prediction_sources": tuple(
+                    ParsingPredictionSource(
+                        engine=result.engine,
+                        engine_version=result.engine_version,
+                        configuration_hash=result.configuration_hash,
+                        page_numbers=tuple(page.number for page in result.document.pages),
+                    )
+                    for result in parsed
+                )
+            }
+        )
     except (ValidationError, json.JSONDecodeError, ValueError) as error:
         raise typer.BadParameter(str(error)) from error
     payload = report.model_dump_json(indent=2)
@@ -215,6 +272,8 @@ def run_mineru(
     end_page: Annotated[int | None, typer.Option(min=1)] = None,
     api_url: Annotated[str | None, typer.Option()] = None,
     executable: Annotated[str, typer.Option()] = "mineru",
+    device: Annotated[MinerUDevice, typer.Option()] = MinerUDevice.AUTO,
+    gpu_index: Annotated[int, typer.Option(min=0)] = 0,
 ) -> None:
     """Run an optional MinerU 3.x CLI runtime and convert its v2 content list."""
     adapter = MinerUCLIAdapter(
@@ -223,6 +282,8 @@ def run_mineru(
         method=method,
         language=language,
         api_url=api_url,
+        device=device,
+        gpu_index=gpu_index,
     )
     try:
         result = adapter.parse(
@@ -236,3 +297,32 @@ def run_mineru(
     result_path = output_dir.resolve() / "mathlens-parse-result.json"
     result_path.write_text(result.model_dump_json(indent=2) + "\n", encoding="utf-8")
     typer.echo(str(result_path))
+
+
+@app.command("golden-studio")
+def run_golden_studio(
+    dataset: Annotated[Path, typer.Argument(exists=True, file_okay=True, dir_okay=False)],
+    artifact_dir: Annotated[
+        Path, typer.Option("--artifact-dir", exists=True, file_okay=False, dir_okay=True)
+    ],
+    prediction: Annotated[
+        list[Path] | None,
+        typer.Option("--prediction", exists=True, file_okay=True, dir_okay=False),
+    ] = None,
+    studio_dir: Annotated[Path, typer.Option("--studio-dir")] = Path("studio/dist"),
+    host: Annotated[str, typer.Option()] = "127.0.0.1",
+    port: Annotated[int, typer.Option(min=1, max=65535)] = 8765,
+) -> None:
+    """Run the local Golden Annotation Workbench."""
+    if not (studio_dir / "index.html").is_file():
+        raise typer.BadParameter(f"studio frontend is not built: {studio_dir}")
+    try:
+        workspace = GoldenWorkspace(
+            dataset,
+            artifact_dir,
+            tuple(prediction or ()),
+        )
+    except ValueError as error:
+        raise typer.BadParameter(str(error)) from error
+    typer.echo(f"MathLens Golden Workbench: http://{host}:{port}")
+    serve_studio(workspace, studio_dir, host, port)

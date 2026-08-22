@@ -12,6 +12,10 @@ __pycache__/
 htmlcov/
 dist/
 build/
+node_modules/
+*.tsbuildinfo
+playwright-report/
+test-results/
 
 # MathLens runtime data
 artifacts/

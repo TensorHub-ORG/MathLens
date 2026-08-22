@@ -25,6 +25,10 @@
 - [0001：稳定核心与 Skill 边界](0001-stable-core-and-skills.md)
 - [0002：内容寻址的页面图 Artifact](0002-content-addressed-page-artifacts.md)
 - [0003：Golden 评测与 MinerU 接入边界](0003-golden-evaluation-and-mineru-boundary.md)
+- [0004：本地 Golden Workbench 边界](0004-local-golden-workbench-boundary.md)
+- [0005：Golden 分维度验证](0005-dimension-aware-golden-review.md)
+- [0006：以 MathIR 为中心的平台架构](0006-mathir-centered-platform.md)
+- [0007：块级内容 Golden 与抽样基线](0007-block-level-content-golden.md)
 
 ## 模板
 

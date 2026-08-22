@@ -13,7 +13,13 @@ from mathlens.domain import (
     SourceDocument,
 )
 from mathlens.evaluation import evaluate_parsing
-from mathlens.golden import AnnotationStatus, GoldenBlock, GoldenDataset, GoldenPage
+from mathlens.golden import (
+    GoldenBlock,
+    GoldenDataset,
+    GoldenPage,
+    ReviewAspect,
+    SuggestionSource,
+)
 
 SOURCE_HASH = "a" * 64
 
@@ -43,25 +49,38 @@ def _prediction_block(
     )
 
 
-def _golden(status: AnnotationStatus = AnnotationStatus.REVIEWED) -> GoldenDataset:
+def _golden(
+    verified_aspects: tuple[ReviewAspect, ...] = (
+        ReviewAspect.LAYOUT,
+        ReviewAspect.READING_ORDER,
+    ),
+) -> GoldenDataset:
     blocks = (
         GoldenBlock(
             id="title",
             type=BlockType.TITLE,
             bbox=_box(10, 10, 400, 80),
             source_transcription="高等代数",
+            verified_aspects=(ReviewAspect.TRANSCRIPTION,),
         ),
         GoldenBlock(
             id="text",
             type=BlockType.TEXT,
             bbox=_box(10, 100, 900, 200),
             source_transcription="设 A 为矩阵",
+            verified_aspects=(ReviewAspect.TRANSCRIPTION,),
         ),
         GoldenBlock(
             id="formula",
             type=BlockType.FORMULA,
             bbox=_box(100, 300, 800, 400),
-            source_transcription=r"\det(A - \lambda I)=0",
+            latex=r"\det(A - \lambda I)=0",
+            verified_aspects=(ReviewAspect.FORMULA,),
+            suggested_by=SuggestionSource(
+                engine="test",
+                engine_version="1.0",
+                block_id="p-formula",
+            ),
         ),
     )
     return GoldenDataset(
@@ -74,11 +93,9 @@ def _golden(status: AnnotationStatus = AnnotationStatus.REVIEWED) -> GoldenDatas
                 page_number=1,
                 strata=("mixed",),
                 rationale="metric contract",
-                status=status,
+                verified_aspects=verified_aspects,
                 blocks=blocks,
-                reading_order=("title", "text", "formula")
-                if status is not AnnotationStatus.DRAFT
-                else (),
+                reading_order=("title", "text", "formula"),
             ),
         ),
     )
@@ -114,15 +131,41 @@ def test_parsing_evaluation_reports_layout_content_type_and_order() -> None:
 
     summary = report.summary
     assert summary.matched_blocks == 3
+    assert summary.assisted_reference_blocks == 1
     assert summary.layout_precision == pytest.approx(0.75)
     assert summary.layout_recall == 1
     assert summary.type_accuracy == pytest.approx(2 / 3)
     assert summary.reading_order_accuracy == pytest.approx(2 / 3)
     assert summary.text_samples == 2
     assert summary.mean_text_error_rate == pytest.approx(1 / 14)
+    assert summary.formula_samples == 1
     assert summary.formula_exact_match_rate == 1
 
 
-def test_parsing_evaluation_rejects_unreviewed_golden_page() -> None:
-    with pytest.raises(ValueError, match="not reviewed"):
-        evaluate_parsing(_golden(AnnotationStatus.DRAFT), _prediction())
+def test_parsing_evaluation_omits_unverified_content_metrics() -> None:
+    golden = _golden()
+    unverified_pages = tuple(
+        page.model_copy(
+            update={
+                "blocks": tuple(
+                    block.model_copy(update={"verified_aspects": ()}) for block in page.blocks
+                )
+            }
+        )
+        for page in golden.pages
+    )
+    report = evaluate_parsing(golden.model_copy(update={"pages": unverified_pages}), _prediction())
+
+    assert report.summary.text_samples == 0
+    assert report.summary.mean_text_error_rate is None
+    assert report.summary.formula_samples == 0
+    assert report.summary.formula_exact_match_rate is None
+    assert report.summary.eligible_text_blocks == 2
+    assert report.summary.verified_text_blocks == 0
+    assert report.summary.eligible_formula_blocks == 1
+    assert report.summary.verified_formula_blocks == 0
+
+
+def test_parsing_evaluation_rejects_unverified_layout() -> None:
+    with pytest.raises(ValueError, match="verified layout"):
+        evaluate_parsing(_golden(()), _prediction())

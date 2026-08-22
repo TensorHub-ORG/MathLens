@@ -5,7 +5,12 @@ from shutil import copyfile
 import pymupdf
 import pytest
 
-from mathlens.adapters.mineru import MinerUCLIAdapter, import_content_list_v2
+from mathlens.adapters.mineru import (
+    MinerUCLIAdapter,
+    MinerUDevice,
+    MinerURuntimeInfo,
+    import_content_list_v2,
+)
 from mathlens.domain import BlockType, CoordinateSpace, DiagnosticLevel
 
 
@@ -61,29 +66,53 @@ def test_mineru_cli_adapter_runs_one_based_page_range(
     output = tmp_path / "output"
     _create_source(source)
     commands: list[list[str]] = []
+    parsing_run_options: dict[str, object] = {}
 
-    def fake_run(command: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+    def fake_run(command: list[str], **options: object) -> subprocess.CompletedProcess[str]:
         commands.append(command)
-        if command[-1] == "--version":
-            return subprocess.CompletedProcess(command, 0, stdout="MinerU 3.0.0\n", stderr="")
+        parsing_run_options.update(options)
         mineru_output = output / "source" / "source_content_list_v2.json"
         mineru_output.parent.mkdir(parents=True)
         copyfile("tests/fixtures/mineru_content_list_v2.json", mineru_output)
         return subprocess.CompletedProcess(command, 0, stdout="done\n", stderr="")
 
-    monkeypatch.setattr("mathlens.adapters.mineru.cli.shutil.which", lambda _: "mineru.exe")
-    monkeypatch.setattr("mathlens.adapters.mineru.cli.subprocess.run", fake_run)
+    runtime = MinerURuntimeInfo(
+        executable="mineru.exe",
+        python_executable="python.exe",
+        mineru_version="3.0.0",
+        torch_version="2.11.0+cu128",
+        torch_cuda_version="12.8",
+        cuda_available=True,
+        cuda_device_count=1,
+        cuda_device_name="test GPU",
+        cuda_memory_bytes=6 * 1024**3,
+        onnxruntime_providers=("CPUExecutionProvider",),
+    )
+    monkeypatch.setattr(
+        "mathlens.adapters.mineru.cli.resolve_mineru_executable", lambda _: "mineru.exe"
+    )
+    monkeypatch.setattr(
+        "mathlens.adapters.mineru.cli.probe_mineru_runtime", lambda *_, **__: runtime
+    )
+    monkeypatch.setattr("mathlens.adapters.mineru.cli.run_managed_process", fake_run)
 
     result = MinerUCLIAdapter().parse(source, output, start_page=7, end_page=7)
 
     assert result.document.pages[0].number == 7
-    assert commands[1][commands[1].index("--start") + 1] == "6"
-    assert commands[1][commands[1].index("--end") + 1] == "6"
+    assert commands[0][commands[0].index("--start") + 1] == "6"
+    assert commands[0][commands[0].index("--end") + 1] == "6"
+    assert "capture_output" not in parsing_run_options
+    assert hasattr(parsing_run_options["stdout"], "write")
+    assert "environment" in parsing_run_options
     assert result.configuration == {
         "backend": "pipeline",
         "language": "ch",
         "method": "ocr",
         "service": "local",
+        "device": "auto",
+        "torch_version": "2.11.0+cu128",
+        "torch_cuda_version": "12.8",
+        "cuda_device_name": "test GPU",
     }
 
 
@@ -93,7 +122,40 @@ def test_mineru_cli_adapter_requires_installed_executable(
 ) -> None:
     source = tmp_path / "source.pdf"
     _create_source(source)
-    monkeypatch.setattr("mathlens.adapters.mineru.cli.shutil.which", lambda _: None)
+
+    def missing(_: str) -> str:
+        raise FileNotFoundError("separate runtime")
+
+    monkeypatch.setattr("mathlens.adapters.mineru.cli.resolve_mineru_executable", missing)
 
     with pytest.raises(FileNotFoundError, match="separate runtime"):
         MinerUCLIAdapter().parse(source, tmp_path / "output")
+
+
+def test_mineru_cli_adapter_rejects_unavailable_requested_cuda(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = tmp_path / "source.pdf"
+    _create_source(source)
+    runtime = MinerURuntimeInfo(
+        executable="mineru.exe",
+        python_executable="python.exe",
+        mineru_version="3.4.5",
+        torch_version="2.13.0+cpu",
+        torch_cuda_version=None,
+        cuda_available=False,
+        cuda_device_count=0,
+        cuda_device_name=None,
+        cuda_memory_bytes=None,
+        onnxruntime_providers=("CPUExecutionProvider",),
+    )
+    monkeypatch.setattr(
+        "mathlens.adapters.mineru.cli.resolve_mineru_executable", lambda _: "mineru.exe"
+    )
+    monkeypatch.setattr(
+        "mathlens.adapters.mineru.cli.probe_mineru_runtime", lambda *_, **__: runtime
+    )
+
+    with pytest.raises(RuntimeError, match="CUDA was requested"):
+        MinerUCLIAdapter(device=MinerUDevice.CUDA).parse(source, tmp_path / "output")

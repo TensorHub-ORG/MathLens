@@ -1,7 +1,7 @@
 # MathLens 架构原则
 
 状态：Active
-最后更新：2026-08-21
+最后更新：2026-08-22
 
 ## 架构目标
 
@@ -44,12 +44,59 @@ Domain never imports Adapters, CLI, model SDKs, or workflow runtimes.
 src/mathlens/
 ├── domain/       # MathIR、值对象和不变量
 ├── ports/        # 解析器、存储、编译器等协议
-├── adapters/     # PyMuPDF、未来的 MinerU 等实现
+├── adapters/     # PyMuPDF、MinerU 和外部运行时实现
+├── application/  # 用例编排，不依赖具体 UI
 ├── evaluation/   # 评测数据结构和指标
+├── golden/       # Golden Schema 与验证不变量
+├── studio/       # 本地 Workbench 服务边界
 └── cli.py        # 当前接口层
 ```
 
-当真实用例出现后再增加 `application/` 和 `artifacts/` 模块，不创建没有调用方的抽象层。
+新模块必须由真实用例驱动，不创建没有调用方的抽象层。
+
+## 长期目标架构
+
+```text
+Mathematical Information Containers
+PDF · Image · TeX · Markdown · HTML · Office · Handwriting · Lean source
+                              │
+                    Document Adapters
+          MinerU · PyMuPDF · future parsers/importers
+                              │
+                              ▼
+┌────────────────────── MathLens Core ──────────────────────┐
+│       MathIR contracts · Artifact DAG · Provenance         │
+│       Schema registry · Evaluation · Capability ports      │
+└────────────────────────────┬───────────────────────────────┘
+                             │ typed artifacts
+                             ▼
+┌────────────────────── MathLens Flow ──────────────────────┐
+│ state graph · checkpoint · retry · cache · HITL · policy  │
+└───────────────┬────────────────┬────────────────┬──────────┘
+                │                │                │
+        Understanding       Reasoning       Verification
+        OCR / structure     solve / prove    evidence / kernel
+        MinerU / PyMuPDF    model / agents   Lean / CAS / tests
+                └────────────────┼────────────────┘
+                                 ▼
+                      Output / Knowledge Skills
+                  LaTeX · search index · study material
+```
+
+MathIR 是数据平面的核心；Flow 是调度和控制平面。Flow 只能通过版本化 artifact 与节点通信，
+不能把某个 Agent 框架的私有 state 当作长期数据协议。Skills 是能力与分发层，可以跨越理解、
+推理、验证和输出阶段，但不能绕过 Core 的来源与证据约束。
+
+### LangGraph 的位置
+
+MathLens Flow 借鉴 [LangGraph](https://github.com/langchain-ai/langgraph) 的状态图、持久化
+checkpoint、可恢复执行和人工中断思想。未来
+可以提供 LangGraph-backed runtime，但 LangGraph 不是架构层，也不进入 MathIR 或 Domain。
+Flow 首先冻结自己的 Node、Run、Checkpoint、Interrupt 和 Artifact 契约，再决定内部执行器。
+这使未来可以替换为自研运行时、任务队列或其他图执行引擎。
+
+可视化工作流可借鉴 Dify、ComfyUI 等产品的节点编辑体验；画布 Schema 同样只描述 MathLens
+Workflow，不直接保存第三方运行时对象。
 
 ## MathIR 原则
 
@@ -60,6 +107,36 @@ src/mathlens/
 - 候选内容记录引擎、版本和置信度；
 - 原始转录、规范化内容和生成内容使用不同字段或 artifact；
 - Schema 发生破坏性变化时提升版本，不编写无限期兼容旧格式的兜底逻辑。
+
+MathIR 采用一个版本化 artifact envelope，并提供相互关联的投影，避免形成一个无限膨胀的
+单体 JSON：
+
+| 投影 | 负责内容 |
+|---|---|
+| Source/Document | 原始容器、页面、几何、阅读顺序、裁剪图和候选转写 |
+| Semantic | 符号、表达式、定义、命题、假设、题目和引用关系 |
+| Reasoning | claim、推理步骤、分支、依赖、生成来源和不确定性 |
+| Verification | 被验证对象、方法、工具链、假设、日志、反例和证据等级 |
+| Presentation | LaTeX、Markdown、HTML、图形和其他可再生成输出 |
+
+投影可以独立生成和版本化，通过稳定 ID 与父 artifact 关联。原始转写永远不会被语义规范化、
+模型解答或形式化翻译覆盖。
+
+## 外部项目的正确边界
+
+| 项目 | 可借鉴或接入的能力 | 在 MathLens 中的位置 |
+|---|---|---|
+| MinerU / PyMuPDF | 容器解析、OCR、页面与布局 | Document Adapter |
+| [Danus](https://github.com/frenzymath/Danus) | 长程多 Agent、事实图、独立 verifier gate | Research Reasoning Skill / 参考架构 |
+| [frenzymath/Archon](https://github.com/frenzymath/Archon) | plan/prover/review 循环、多 harness 长程执行 | Research Reasoning Skill / Flow 实验后端 |
+| [ScalingIntelligence/Archon](https://github.com/ScalingIntelligence/Archon) | generator/critic/ranker/fuser 等推理时组合与搜索 | Reasoning Strategy Skill |
+| [OpenProof](https://github.com/mxthematic/openproof) | 自然语言到 Lean、Agent 与 tactic search 协作 | Formalization + Proof Search Skill |
+| [LeanDojo-v2](https://github.com/lean-dojo/LeanDojo-v2) | Lean 数据提取、训练、检索和证明搜索 | Prover Adapter / Research Skill |
+| [Lean 4 Kernel](https://github.com/leanprover/lean4) | 对形式化命题和证明项做确定性检查 | Verifier、最终信任边界 |
+
+同名 Archon 必须在 manifest 中使用不同 provider/skill ID，不能只以显示名称解析。Danus、
+Archon 和 OpenProof 都不进入 Core 依赖；验证 Skill 即使使用它们生成证明，最终证据仍必须包含
+Lean 工具链、Mathlib revision、命题、假设和内核检查结果。
 
 ## Artifact 原则
 

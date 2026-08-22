@@ -5,6 +5,7 @@ from mathlens.evaluation.parsing_models import (
     ParsingEvaluationReport,
     ParsingEvaluationSummary,
     ParsingPageEvaluation,
+    ParsingPredictionSource,
 )
 
 __all__ = [
@@ -14,6 +15,7 @@ __all__ = [
     "ParsingEvaluationReport",
     "ParsingEvaluationSummary",
     "ParsingPageEvaluation",
+    "ParsingPredictionSource",
     "evaluate_parsing",
     "evaluate_samples",
 ]

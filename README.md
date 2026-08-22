@@ -1,10 +1,22 @@
 # MathLens
 
-MathLens 是一个面向数学文档的开放、可验证、可扩展的智能处理与推理平台。
+MathLens 是一个面向数学信息载体的开放、可验证、可扩展的智能处理与推理平台。PDF 是首个
+输入形式，MathIR 才是连接解析、推理、验证、知识与输出能力的长期核心协议。
 
 当前仓库首先建设稳定的 `MathLens Core`：把扫描 PDF 和图片转换为具有来源坐标、
 候选结果与完整溯源信息的 MathIR，并为 OCR、LaTeX 重构、文档结构理解和质量评测
 提供可靠基础。Agent、形式化验证和翻译等高级能力将在核心稳定后以 Skill 形式接入。
+
+## M1 实际成果
+
+首个里程碑已经完成从扫描 PDF、300 DPI 页面 artifact、MinerU GPU 解析，到块级 Golden
+复核与可复现评测的完整闭环。Golden Annotation Workbench 支持页面与阅读顺序校验、
+原图裁剪、KaTeX 公式对照、风险队列和稳定文本抽样。
+
+![MathLens Golden Annotation Workbench](docs/assets/golden-workbench.png)
+
+首份基线的适用范围、指标和辅助标注限制见
+[MinerU 3.4.5 M1 解析基线](docs/baselines/mineru-3.4.5-m1.md)。
 
 ## 当前能力
 
@@ -14,11 +26,13 @@ MathLens 是一个面向数学文档的开放、可验证、可扩展的智能�
 - 内容寻址、可复现且带坐标映射的页面 artifact；
 - 带引擎、版本和置信度的内容候选；
 - 文本字符错误率和保守的公式精确匹配评测；
+- 响应式 Golden Annotation Workbench；
+- 隔离的 MinerU 3.4.5 CPU/CUDA 运行时；
 - 可作为未来 Tauri sidecar 使用的 CLI；
 - pytest、Ruff、mypy strict 质量门。
 
-MinerU、GPU 模型和 Agent Runtime 不属于基础环境。它们将在建立真实基线和 golden
-dataset 后，通过明确的端口和适配器接入。
+MinerU 和 GPU 模型通过独立适配器与隔离运行时接入，不属于 Core 基础环境。Agent Runtime
+将在后续里程碑通过明确端口接入。
 
 ## 项目文档
 
@@ -91,6 +105,32 @@ manifest 记录源文件哈希、页码、DPI、像素尺寸、PDF 点坐标到�
 
 运行产物放在 `artifacts/` 或 `workspace/`，两者均不进入版本控制。不要把原始 PDF、
 模型权重、OCR 缓存或用户文档复制到源码目录。
+
+## Golden Annotation Workbench
+
+构建独立前端并启动本地标注工作台：
+
+```powershell
+cd studio
+npm ci
+npm run build
+cd ..
+
+.tools\uv run mathlens golden-studio workspace\golden\reference.json `
+  --artifact-dir workspace\golden\artifacts `
+  --prediction workspace\mineru-page-7-retry\mathlens-parse-result.json
+```
+
+浏览器打开 `http://127.0.0.1:8765`。完整标注规则和复核门禁见
+[Golden Dataset 文档](docs/golden-datasets.md)。
+
+前端类型检查与浏览器交互测试：
+
+```powershell
+cd studio
+npm run typecheck
+npm run test:e2e
+```
 
 ## 许可证
 

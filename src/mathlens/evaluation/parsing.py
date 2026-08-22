@@ -10,7 +10,8 @@ from mathlens.evaluation.parsing_models import (
     ParsingEvaluationSummary,
     ParsingPageEvaluation,
 )
-from mathlens.golden import AnnotationStatus, GoldenBlock, GoldenDataset, GoldenPage
+from mathlens.golden import GoldenBlock, GoldenDataset, GoldenPage, ReviewAspect
+from mathlens.golden.models import TRANSCRIBABLE_BLOCK_TYPES
 
 
 @dataclass(frozen=True, slots=True)
@@ -112,29 +113,39 @@ def _evaluate_page(
     ]
     reading_pairs = 0
     correct_reading_pairs = 0
-    for first, second in combinations(order_pairs, 2):
-        reading_pairs += 1
-        if (first[0] - second[0]) * (first[1] - second[1]) > 0:
-            correct_reading_pairs += 1
+    if ReviewAspect.READING_ORDER in reference.verified_aspects:
+        for first, second in combinations(order_pairs, 2):
+            reading_pairs += 1
+            if (first[0] - second[0]) * (first[1] - second[1]) > 0:
+                correct_reading_pairs += 1
 
     text_errors = []
     formula_matches = []
     for match in matches:
         golden_block = reference.blocks[match.reference_index]
-        if golden_block.source_transcription is None:
-            continue
         prediction = _selected_content(predictions[match.prediction_index])
         if golden_block.type is BlockType.FORMULA:
+            if (
+                ReviewAspect.FORMULA not in golden_block.verified_aspects
+                or golden_block.latex is None
+            ):
+                continue
             formula_matches.append(
-                normalize_formula(golden_block.source_transcription)
-                == normalize_formula(prediction)
+                normalize_formula(golden_block.latex) == normalize_formula(prediction)
             )
         else:
+            if (
+                ReviewAspect.TRANSCRIPTION not in golden_block.verified_aspects
+                or golden_block.source_transcription is None
+            ):
+                continue
             text_errors.append(text_error_rate(golden_block.source_transcription, prediction))
 
     result = ParsingPageEvaluation(
         page_number=reference.page_number,
+        verified_aspects=reference.verified_aspects,
         reference_blocks=len(reference.blocks),
+        assisted_reference_blocks=sum(block.suggested_by is not None for block in reference.blocks),
         predicted_blocks=len(predictions),
         matched_blocks=len(matches),
         layout_precision=precision,
@@ -145,8 +156,18 @@ def _evaluate_page(
         reading_order_accuracy=(
             _safe_ratio(correct_reading_pairs, reading_pairs) if reading_pairs else None
         ),
+        eligible_text_blocks=sum(
+            block.type in TRANSCRIBABLE_BLOCK_TYPES for block in reference.blocks
+        ),
+        verified_text_blocks=sum(
+            ReviewAspect.TRANSCRIPTION in block.verified_aspects for block in reference.blocks
+        ),
         text_samples=len(text_errors),
         mean_text_error_rate=(sum(text_errors) / len(text_errors) if text_errors else None),
+        eligible_formula_blocks=sum(block.type is BlockType.FORMULA for block in reference.blocks),
+        verified_formula_blocks=sum(
+            ReviewAspect.FORMULA in block.verified_aspects for block in reference.blocks
+        ),
         formula_samples=len(formula_matches),
         formula_exact_match_rate=(
             sum(formula_matches) / len(formula_matches) if formula_matches else None
@@ -173,10 +194,10 @@ def evaluate_parsing(
     incomplete = [
         page.page_number
         for page in reference.pages
-        if page.status not in {AnnotationStatus.REVIEWED, AnnotationStatus.ADJUDICATED}
+        if ReviewAspect.LAYOUT not in page.verified_aspects
     ]
     if incomplete:
-        raise ValueError(f"golden pages are not reviewed: {incomplete}")
+        raise ValueError(f"golden pages do not have verified layout: {incomplete}")
     if reference.source.sha256 != prediction.source_sha256:
         raise ValueError("golden dataset and prediction source hashes differ")
 
@@ -196,6 +217,7 @@ def evaluate_parsing(
     summary = ParsingEvaluationSummary(
         pages=len(counts),
         reference_blocks=reference_blocks,
+        assisted_reference_blocks=sum(item.result.assisted_reference_blocks for item in counts),
         predicted_blocks=predicted_blocks,
         matched_blocks=matched_blocks,
         layout_precision=precision,
@@ -212,10 +234,14 @@ def evaluate_parsing(
             if reading_pairs
             else None
         ),
+        eligible_text_blocks=sum(item.result.eligible_text_blocks for item in counts),
+        verified_text_blocks=sum(item.result.verified_text_blocks for item in counts),
         text_samples=text_samples,
         mean_text_error_rate=(
             sum(item.text_error_total for item in counts) / text_samples if text_samples else None
         ),
+        eligible_formula_blocks=sum(item.result.eligible_formula_blocks for item in counts),
+        verified_formula_blocks=sum(item.result.verified_formula_blocks for item in counts),
         formula_samples=formula_samples,
         formula_exact_match_rate=(
             sum(item.exact_formulas for item in counts) / formula_samples
@@ -224,6 +250,8 @@ def evaluate_parsing(
         ),
     )
     return ParsingEvaluationReport(
+        dataset_id=reference.dataset_id,
+        source_sha256=reference.source.sha256,
         iou_threshold=iou_threshold,
         pages=tuple(item.result for item in counts),
         summary=summary,

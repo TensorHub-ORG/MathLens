@@ -82,7 +82,11 @@ def test_golden_validate_reports_seed_selection() -> None:
     assert result.exit_code == 0
     report = json.loads(result.stdout)
     assert report["selected_pages"] == 12
-    assert report["status_counts"]["selected"] == 12
+    assert report["verified_page_aspect_counts"] == {
+        "layout": 0,
+        "reading_order": 0,
+    }
+    assert report["verified_content_blocks"] == {"formula": 0, "transcription": 0}
 
 
 def test_mineru_import_writes_mathir_result(tmp_path: Path) -> None:

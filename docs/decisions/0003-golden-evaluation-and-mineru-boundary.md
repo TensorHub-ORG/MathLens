@@ -1,6 +1,6 @@
 # 0003：Golden 评测与 MinerU 接入边界
 
-状态：Accepted
+状态：Superseded by ADR 0005
 日期：2026-08-21
 
 ## 背景

@@ -23,13 +23,17 @@
 
 ## M1：Ingestion Baseline
 
-状态：进行中
+状态：已完成
 
 阶段进度：
 
 - M1-A 页面渲染与 artifact：已完成；
-- M1-B 代表页选择、Golden Schema 与评测器：基础设施已完成，12 页人工标注待进行；
-- M1-C MinerU Adapter：3.4.5 单页真实闭环已完成，完整 baseline 等待 Golden 复核。
+- M1-B 代表页选择、Golden Schema、评测器与本地标注工作台：已完成，12 页版面与阅读顺序
+  均已验证；
+- M1-C MinerU Adapter：3.4.5 的 12 个代表页预测均已生成，CUDA Pipeline、设备诊断和
+  Windows 子进程回收已完成；
+- M1-D Content Golden & Parsing Baseline：已完成。29/29 个公式 block 与 47/228 个文本
+  block 已人工复核，首份可复现的 MinerU 3.4.5 管线校准基线已经冻结。
 
 范围：
 
@@ -46,6 +50,9 @@
 - 每个识别 block 可以回到原页坐标和裁剪图；
 - 基线报告可在同一锁定环境中复现；
 - 替换解析器不改变 MathIR 消费方。
+
+M1-D 已将 M1-A 至 M1-C 的产物转化为有明确人工证据、覆盖率和复现条件的基线。结果与
+辅助标注限制见[首份 M1 解析基线](baselines/mineru-3.4.5-m1.md)。下一阶段为 M2。
 
 ## M2：LaTeX Reconstruction
 
