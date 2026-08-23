@@ -1,5 +1,5 @@
 {
-  "schema": "mathlens.golden-dataset.v3",
+  "schema": "mathcraft.golden-dataset.v3",
   "dataset_id": "high-algebra-2022-2024-seed",
   "source": {
     "filename": "2022-2024各高校高等代数真题汇总.pdf",

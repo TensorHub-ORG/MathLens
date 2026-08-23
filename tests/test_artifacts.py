@@ -3,16 +3,16 @@ from pathlib import Path
 import pymupdf
 import pytest
 
-from mathlens.adapters.filesystem import FileSystemPageArtifactStore
-from mathlens.adapters.pymupdf import PyMuPDFPageRenderer
-from mathlens.application import render_document
-from mathlens.domain import CoordinateSpace
+from mathcraft.adapters.filesystem import FileSystemPageArtifactStore
+from mathcraft.adapters.pymupdf import PyMuPDFPageRenderer
+from mathcraft.application import render_document
+from mathcraft.domain import CoordinateSpace
 
 
 def _create_pdf(path: Path) -> None:
     document = pymupdf.open()
     page = document.new_page(width=144, height=72)
-    page.insert_text((10, 20), "MathLens artifact")
+    page.insert_text((10, 20), "MathCraft artifact")
     document.save(path)
     document.close()
 

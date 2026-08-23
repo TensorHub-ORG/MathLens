@@ -4,7 +4,7 @@ from pathlib import Path
 import pymupdf
 from typer.testing import CliRunner
 
-from mathlens.cli import app
+from mathcraft.cli import app
 
 runner = CliRunner()
 
@@ -14,7 +14,7 @@ def test_doctor_reports_runtime_and_external_tools() -> None:
 
     assert result.exit_code == 0
     report = json.loads(result.stdout)
-    assert report["mathlens"] == "0.1.0"
+    assert report["mathcraft"] == "0.1.0"
     assert report["pymupdf"]
     assert set(report["tools"]) == {"pdfinfo", "pdftoppm", "xelatex", "latexmk", "mineru"}
 
@@ -24,7 +24,7 @@ def test_inspect_writes_document_profile(tmp_path: Path) -> None:
     output = tmp_path / "profile.json"
     document = pymupdf.open()
     page = document.new_page()
-    page.insert_text((72, 72), "MathLens")
+    page.insert_text((72, 72), "MathCraft")
     document.save(source)
     document.close()
 

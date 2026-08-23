@@ -3,8 +3,8 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from mathlens.domain import BlockType, BoundingBox, CoordinateSpace, SourceDocument
-from mathlens.golden import GoldenBlock, GoldenDataset, GoldenPage, ReviewAspect
+from mathcraft.domain import BlockType, BoundingBox, CoordinateSpace, SourceDocument
+from mathcraft.golden import GoldenBlock, GoldenDataset, GoldenPage, ReviewAspect
 
 
 def test_seed_selection_contains_twelve_stratified_pages() -> None:
@@ -53,7 +53,7 @@ def test_content_verification_requires_verified_layout() -> None:
 
 def test_v2_page_content_verification_migrates_to_v3_blocks() -> None:
     payload = {
-        "schema": "mathlens.golden-dataset.v2",
+        "schema": "mathcraft.golden-dataset.v2",
         "dataset_id": "legacy",
         "source": {"filename": "source.pdf", "sha256": "0" * 64},
         "source_page_count": 1,
@@ -79,7 +79,7 @@ def test_v2_page_content_verification_migrates_to_v3_blocks() -> None:
 
     dataset = GoldenDataset.model_validate(payload)
 
-    assert dataset.schema_id == "mathlens.golden-dataset.v3"
+    assert dataset.schema_id == "mathcraft.golden-dataset.v3"
     assert dataset.pages[0].verified_aspects == (ReviewAspect.LAYOUT,)
     assert dataset.pages[0].blocks[0].verified_aspects == (ReviewAspect.FORMULA,)
 

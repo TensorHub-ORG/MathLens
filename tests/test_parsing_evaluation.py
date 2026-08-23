@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from mathlens.domain import (
+from mathcraft.domain import (
     Block,
     BlockType,
     BoundingBox,
@@ -12,8 +12,8 @@ from mathlens.domain import (
     Page,
     SourceDocument,
 )
-from mathlens.evaluation import evaluate_parsing
-from mathlens.golden import (
+from mathcraft.evaluation import evaluate_parsing
+from mathcraft.golden import (
     GoldenBlock,
     GoldenDataset,
     GoldenPage,

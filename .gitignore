@@ -17,7 +17,7 @@ node_modules/
 playwright-report/
 test-results/
 
-# MathLens runtime data
+# MathCraft runtime data
 artifacts/
 workspace/
 *.log

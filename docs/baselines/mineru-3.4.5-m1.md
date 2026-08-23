@@ -5,7 +5,7 @@
 
 ## 结论
 
-M1 已完成扫描 PDF 到可审计解析结果的首个闭环。本报告冻结的是 MathLens 解析、Golden
+M1 已完成扫描 PDF 到可审计解析结果的首个闭环。本报告冻结的是 MathCraft 解析、Golden
 复核与评测管线的校准基线，不是 MinerU 的独立精度声明。
 
 ## 数据与环境
@@ -15,8 +15,8 @@ M1 已完成扫描 PDF 到可审计解析结果的首个闭环。本报告冻结
 - 代表页：1、7、12、30、50、70、90、110、130、150、170、207，共 12 页；
 - 页面渲染：PyMuPDF，300 DPI，内容寻址 artifact；
 - 解析器：MinerU 3.4.5，`pipeline / ocr / ch`，以 CUDA 批量解析为主；
-- Golden Schema：`mathlens.golden-dataset.v3`；
-- Evaluation Schema：`mathlens.parsing-evaluation.v2`；
+- Golden Schema：`mathcraft.golden-dataset.v3`；
+- Evaluation Schema：`mathcraft.parsing-evaluation.v2`；
 - 匹配阈值：IoU 0.5。
 
 原始 PDF、页面图和模型输出位于本地 `workspace/`，不进入仓库。代表页选择清单、Golden
@@ -64,21 +64,21 @@ Schema、评测实现和两套 uv 锁文件进入版本控制。
 MathIR 预测，然后运行：
 
 ```powershell
-.tools\uv run mathlens golden-validate workspace\golden\reference.json
+.tools\uv run mathcraft golden-validate workspace\golden\reference.json
 
-.tools\uv run mathlens evaluate-parsing workspace\golden\reference.json `
-  workspace\mineru-page-1\mathlens-parse-result.json `
-  workspace\mineru-page-7-retry\mathlens-parse-result.json `
-  workspace\mineru-page-12\mathlens-parse-result.json `
-  workspace\mineru-page-30\mathlens-parse-result.json `
-  workspace\mineru-page-50\mathlens-parse-result.json `
-  workspace\mineru-page-70\mathlens-parse-result.json `
-  workspace\mineru-page-90\mathlens-parse-result.json `
-  workspace\mineru-page-110\mathlens-parse-result.json `
-  workspace\mineru-page-130\mathlens-parse-result.json `
-  workspace\mineru-page-150\mathlens-parse-result.json `
-  workspace\mineru-page-170\mathlens-parse-result.json `
-  workspace\mineru-page-207\mathlens-parse-result.json `
+.tools\uv run mathcraft evaluate-parsing workspace\golden\reference.json `
+  workspace\mineru-page-1\mathcraft-parse-result.json `
+  workspace\mineru-page-7-retry\mathcraft-parse-result.json `
+  workspace\mineru-page-12\mathcraft-parse-result.json `
+  workspace\mineru-page-30\mathcraft-parse-result.json `
+  workspace\mineru-page-50\mathcraft-parse-result.json `
+  workspace\mineru-page-70\mathcraft-parse-result.json `
+  workspace\mineru-page-90\mathcraft-parse-result.json `
+  workspace\mineru-page-110\mathcraft-parse-result.json `
+  workspace\mineru-page-130\mathcraft-parse-result.json `
+  workspace\mineru-page-150\mathcraft-parse-result.json `
+  workspace\mineru-page-170\mathcraft-parse-result.json `
+  workspace\mineru-page-207\mathcraft-parse-result.json `
   --verified-only --output workspace\evaluations\mineru-3.4.5-m1-final.json
 ```
 

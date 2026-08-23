@@ -11,7 +11,7 @@
 
 ## 决策
 
-1. 页面渲染结果使用版本化 Schema `mathlens.page-image.v1`。
+1. 页面渲染结果使用版本化 Schema `mathcraft.page-image.v1`。
 2. 每个页面是独立、不可变的 artifact，目录由 `artifact_id` 分层寻址，包含 `page.png` 和
    `manifest.json`。
 3. `content_hash` 只标识 PNG 字节；`artifact_id` 同时绑定源文档哈希、页码、内容哈希、配置、
@@ -38,7 +38,7 @@
 
 ### 只使用 PNG 内容哈希作为 Artifact ID
 
-视觉字节相同不代表来源和推导过程相同，会丢失 MathLens 所要求的 provenance 身份。
+视觉字节相同不代表来源和推导过程相同，会丢失 MathCraft 所要求的 provenance 身份。
 
 ### 在 Manifest 中保存绝对源路径
 

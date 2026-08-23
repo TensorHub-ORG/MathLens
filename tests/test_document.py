@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from mathlens.domain import BoundingBox, CoordinateSpace
+from mathcraft.domain import BoundingBox, CoordinateSpace
 
 
 def test_normalized_bounding_box_accepts_valid_coordinates() -> None:

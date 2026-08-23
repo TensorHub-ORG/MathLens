@@ -2,15 +2,15 @@ from pathlib import Path
 
 import pytest
 
-from mathlens.application import prepare_parsing_evaluation
-from mathlens.domain import (
+from mathcraft.application import prepare_parsing_evaluation
+from mathcraft.domain import (
     CoordinateSpace,
     Document,
     DocumentParseResult,
     Page,
     SourceDocument,
 )
-from mathlens.golden import GoldenDataset, GoldenPage, ReviewAspect
+from mathcraft.golden import GoldenDataset, GoldenPage, ReviewAspect
 
 SOURCE_HASH = "a" * 64
 

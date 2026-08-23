@@ -1,6 +1,6 @@
 # 贡献指南
 
-MathLens 当前处于 Core Foundation 阶段。贡献应优先提高真实数学文档处理的正确性、可追溯性
+MathCraft 当前处于 Core Foundation 阶段。贡献应优先提高真实数学文档处理的正确性、可追溯性
 和可复现性，避免提前实现通用插件市场或多 Agent 框架。
 
 ## 开始之前
@@ -25,10 +25,10 @@ irm https://astral.sh/uv/install.ps1 | iex
 ## 必须通过的检查
 
 ```powershell
-.tools\uv run pytest --cov=mathlens --cov-report=term-missing
+.tools\uv run pytest --cov=mathcraft --cov-report=term-missing
 .tools\uv run ruff check .
 .tools\uv run ruff format --check .
-.tools\uv run mypy -p mathlens
+.tools\uv run mypy -p mathcraft
 ```
 
 ## 代码原则
@@ -67,7 +67,7 @@ Verifier 或 Skill 环境中。
 
 除非项目所有者明确要求，不自动提交、推送、发布包或创建远程资源。
 
-MathLens 采用 AGPL-3.0-only 与商业许可证双重授权。双重授权要求项目拥有对全部合并代码
+MathCraft 采用 AGPL-3.0-only 与商业许可证双重授权。双重授权要求项目拥有对全部合并代码
 进行商业再授权的权利。在律师审阅的 CLA 正式上线前，维护者不得合并不包含明确商业再
 授权许可的外部代码。具体要求见[授权说明](docs/licensing.md)。
 

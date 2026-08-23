@@ -1,11 +1,11 @@
-# MathLens 授权说明
+# MathCraft 授权说明
 
 状态：Active
 最后更新：2026-08-21
 
 ## 双重授权
 
-MathLens 采用双重授权。用户必须选择并遵守以下一种授权路径：
+MathCraft 采用双重授权。用户必须选择并遵守以下一种授权路径：
 
 1. GNU Affero General Public License v3.0 only（`AGPL-3.0-only`）；
 2. 由版权所有者单独书面授予的商业许可证。
@@ -37,8 +37,8 @@ AGPL 是开源许可证，不禁止商业使用。企业只要完整遵守 AGPL�
 
 ## 第三方组件
 
-PyMuPDF、MinerU、Lean、模型权重以及未来插件均可能使用自己的许可证。MathLens 的 AGPL
-或商业许可只覆盖版权所有者有权授权的 MathLens 代码，不能消除第三方许可证义务。
+PyMuPDF、MinerU、Lean、模型权重以及未来插件均可能使用自己的许可证。MathCraft 的 AGPL
+或商业许可只覆盖版权所有者有权授权的 MathCraft 代码，不能消除第三方许可证义务。
 
 每次引入运行时依赖、模型、数据集或复制第三方代码时，都必须记录：
 

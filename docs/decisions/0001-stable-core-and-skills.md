@@ -5,20 +5,20 @@
 
 ## 背景
 
-MathLens 从扫描数学 PDF 的高精度解析需求出发，长期可能包含翻译、解题、形式化验证、
+MathCraft 从扫描数学 PDF 的高精度解析需求出发，长期可能包含翻译、解题、形式化验证、
 定理搜索和教育工作流。如果把这些能力全部写入核心，核心会快速绑定具体模型和工具，难以
 测试、分发和维护。反过来，如果现在先建设通用插件框架，又会在缺少真实 Skill 的情况下
 产生未经验证的抽象。
 
 ## 决策
 
-1. MathLens Core 只负责数学文档基础设施、MathIR、artifact、来源追踪、LaTeX 基础能力和
+1. MathCraft Core 只负责数学文档基础设施、MathIR、artifact、来源追踪、LaTeX 基础能力和
    评价体系。
 2. 外部解析和计算引擎通过 Port、Adapter 或 Verifier 接入。
 3. 面向用户目标的高级能力采用 Skill，但在两个内部 Skill 完成前不冻结公共 SDK。
-4. Agent 调度和 Skill 生命周期属于未来的 MathLens Flow，不属于 Core。
+4. Agent 调度和 Skill 生命周期属于未来的 MathCraft Flow，不属于 Core。
 5. 多 Agent 是工作流执行策略，不作为所有数学任务的默认模型。
-6. 当前产品名称保持为 MathLens；Flow、Skills、Studio 和 Hub 是子系统名称。
+6. 当前产品名称保持为 MathCraft；Flow、Skills、Studio 和 Hub 是子系统名称。
 
 ## 后果
 

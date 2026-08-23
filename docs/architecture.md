@@ -1,11 +1,11 @@
-# MathLens 架构原则
+# MathCraft 架构原则
 
 状态：Active
 最后更新：2026-08-22
 
 ## 架构目标
 
-MathLens 采用稳定核心、显式边界、不可变 artifact 和可验证工作流。架构首先服务于正确性、
+MathCraft 采用稳定核心、显式边界、不可变 artifact 和可验证工作流。架构首先服务于正确性、
 可维护性和可复现性，其次才是扩展数量。
 
 ## 概念词汇
@@ -41,7 +41,7 @@ Domain never imports Adapters, CLI, model SDKs, or workflow runtimes.
 当前源码结构：
 
 ```text
-src/mathlens/
+src/mathcraft/
 ├── domain/       # MathIR、值对象和不变量
 ├── ports/        # 解析器、存储、编译器等协议
 ├── adapters/     # PyMuPDF、MinerU 和外部运行时实现
@@ -64,13 +64,13 @@ PDF · Image · TeX · Markdown · HTML · Office · Handwriting · Lean source
           MinerU · PyMuPDF · future parsers/importers
                               │
                               ▼
-┌────────────────────── MathLens Core ──────────────────────┐
+┌────────────────────── MathCraft Core ──────────────────────┐
 │       MathIR contracts · Artifact DAG · Provenance         │
 │       Schema registry · Evaluation · Capability ports      │
 └────────────────────────────┬───────────────────────────────┘
                              │ typed artifacts
                              ▼
-┌────────────────────── MathLens Flow ──────────────────────┐
+┌────────────────────── MathCraft Flow ──────────────────────┐
 │ state graph · checkpoint · retry · cache · HITL · policy  │
 └───────────────┬────────────────┬────────────────┬──────────┘
                 │                │                │
@@ -89,13 +89,13 @@ MathIR 是数据平面的核心；Flow 是调度和控制平面。Flow 只能通
 
 ### LangGraph 的位置
 
-MathLens Flow 借鉴 [LangGraph](https://github.com/langchain-ai/langgraph) 的状态图、持久化
+MathCraft Flow 借鉴 [LangGraph](https://github.com/langchain-ai/langgraph) 的状态图、持久化
 checkpoint、可恢复执行和人工中断思想。未来
 可以提供 LangGraph-backed runtime，但 LangGraph 不是架构层，也不进入 MathIR 或 Domain。
 Flow 首先冻结自己的 Node、Run、Checkpoint、Interrupt 和 Artifact 契约，再决定内部执行器。
 这使未来可以替换为自研运行时、任务队列或其他图执行引擎。
 
-可视化工作流可借鉴 Dify、ComfyUI 等产品的节点编辑体验；画布 Schema 同样只描述 MathLens
+可视化工作流可借鉴 Dify、ComfyUI 等产品的节点编辑体验；画布 Schema 同样只描述 MathCraft
 Workflow，不直接保存第三方运行时对象。
 
 ## MathIR 原则
@@ -124,7 +124,7 @@ MathIR 采用一个版本化 artifact envelope，并提供相互关联的投影�
 
 ## 外部项目的正确边界
 
-| 项目 | 可借鉴或接入的能力 | 在 MathLens 中的位置 |
+| 项目 | 可借鉴或接入的能力 | 在 MathCraft 中的位置 |
 |---|---|---|
 | MinerU / PyMuPDF | 容器解析、OCR、页面与布局 | Document Adapter |
 | [Danus](https://github.com/frenzymath/Danus) | 长程多 Agent、事实图、独立 verifier gate | Research Reasoning Skill / 参考架构 |

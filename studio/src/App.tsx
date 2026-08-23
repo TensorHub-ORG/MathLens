@@ -56,7 +56,7 @@ export default function App() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <div className="wordmark"><span>MathLens</span><strong>Golden Workbench</strong></div>
+        <div className="wordmark"><span>MathCraft</span><strong>Golden Workbench</strong></div>
         <div className="document-identity">
           <strong>{workspace.dataset.source.filename}</strong>
           <span>{workspace.dataset.dataset_id}</span>

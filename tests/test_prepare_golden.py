@@ -3,12 +3,12 @@ from pathlib import Path
 import pymupdf
 import pytest
 
-from mathlens.adapters.filesystem import FileSystemPageArtifactStore
-from mathlens.adapters.pymupdf import PyMuPDFPageRenderer
-from mathlens.application import prepare_golden_dataset
-from mathlens.domain import SourceDocument
-from mathlens.golden import GoldenDataset, GoldenPage
-from mathlens.hashing import sha256_file
+from mathcraft.adapters.filesystem import FileSystemPageArtifactStore
+from mathcraft.adapters.pymupdf import PyMuPDFPageRenderer
+from mathcraft.application import prepare_golden_dataset
+from mathcraft.domain import SourceDocument
+from mathcraft.golden import GoldenDataset, GoldenPage
+from mathcraft.hashing import sha256_file
 
 
 def _create_pdf(path: Path) -> None:

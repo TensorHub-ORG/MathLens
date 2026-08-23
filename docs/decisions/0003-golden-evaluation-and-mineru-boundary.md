@@ -6,7 +6,7 @@
 ## 背景
 
 OCR 和公式识别输出可能在视觉上合理却改变数学含义。MinerU 3.x 提供统一的
-`content_list_v2.json`，但官方仍将该格式标记为 development version。MathLens 需要接入它，
+`content_list_v2.json`，但官方仍将该格式标记为 development version。MathCraft 需要接入它，
 同时避免让供应商 Schema、重量级模型依赖或模型自标注污染 Core 与评测真值。
 
 ## 决策

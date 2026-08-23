@@ -14,7 +14,7 @@ const page = {
 const selectedPages = [1, 7, 12, 30, 50, 70, 90, 110, 130, 150, 170, 207];
 const snapshot = {
   dataset: {
-    schema: "mathlens.golden-dataset.v3",
+    schema: "mathcraft.golden-dataset.v3",
     dataset_id: "studio-browser-test",
     source: { filename: "sample.pdf", sha256: "b".repeat(64) },
     source_page_count: 207,

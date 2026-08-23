@@ -29,6 +29,7 @@
 - [0005：Golden 分维度验证](0005-dimension-aware-golden-review.md)
 - [0006：以 MathIR 为中心的平台架构](0006-mathir-centered-platform.md)
 - [0007：块级内容 Golden 与抽样基线](0007-block-level-content-golden.md)
+- [0008：TensorHub MathCraft 品牌与子系统命名](0008-tensorhub-mathcraft-brand.md)
 
 ## 模板
 

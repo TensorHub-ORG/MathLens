@@ -1,6 +1,6 @@
 # Golden Dataset 工作流
 
-MathLens 的解析质量由版本化 golden dataset 衡量。选择页面、人工标注和引擎预测必须分离，
+MathCraft 的解析质量由版本化 golden dataset 衡量。选择页面、人工标注和引擎预测必须分离，
 不能把 MinerU 或其他模型的输出直接当作真值。
 
 ## Seed Selection
@@ -15,7 +15,7 @@ MathLens 的解析质量由版本化 golden dataset 衡量。选择页面、人�
 生成本地标注模板与页面 artifact：
 
 ```powershell
-mathlens golden-prepare benchmarks\high-algebra-2022-2024\selection.json source.pdf \
+mathcraft golden-prepare benchmarks\high-algebra-2022-2024\selection.json source.pdf \
   --artifact-dir workspace\golden\artifacts \
   --output workspace\golden\reference.json
 ```
@@ -24,7 +24,7 @@ mathlens golden-prepare benchmarks\high-algebra-2022-2024\selection.json source.
 
 ## Schema
 
-`mathlens.golden-dataset.v3` 使用 0..1000 归一化坐标。每个 block 包含：
+`mathcraft.golden-dataset.v3` 使用 0..1000 归一化坐标。每个 block 包含：
 
 - 稳定且页内唯一的 `id`；
 - MathIR `BlockType`；
@@ -57,9 +57,9 @@ mathlens golden-prepare benchmarks\high-algebra-2022-2024\selection.json source.
 在分阶段复核期间，可以同时合并多个单页预测，并只评测已经复核的页面：
 
 ```powershell
-mathlens evaluate-parsing workspace\golden\reference.json `
-  workspace\mineru-page-7\mathlens-parse-result.json `
-  workspace\mineru-page-12\mathlens-parse-result.json `
+mathcraft evaluate-parsing workspace\golden\reference.json `
+  workspace\mineru-page-7\mathcraft-parse-result.json `
+  workspace\mineru-page-12\mathcraft-parse-result.json `
   --verified-only --output workspace\evaluations\mineru-initial.json
 ```
 
@@ -83,9 +83,9 @@ cd ..
 启动第一个真实工作区：
 
 ```powershell
-mathlens golden-studio workspace\golden\reference.json `
+mathcraft golden-studio workspace\golden\reference.json `
   --artifact-dir workspace\golden\artifacts `
-  --prediction workspace\mineru-page-7-retry\mathlens-parse-result.json
+  --prediction workspace\mineru-page-7-retry\mathcraft-parse-result.json
 ```
 
 服务只监听用户显式指定的本地地址，默认是 `127.0.0.1:8765`。保存请求携带数据集修订哈希；

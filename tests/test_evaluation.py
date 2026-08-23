@@ -1,6 +1,6 @@
 import pytest
 
-from mathlens.evaluation import EvaluationKind, EvaluationSample, evaluate_samples
+from mathcraft.evaluation import EvaluationKind, EvaluationSample, evaluate_samples
 
 
 def test_formula_evaluation_ignores_whitespace_only() -> None:

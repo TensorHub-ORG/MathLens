@@ -46,7 +46,7 @@ export interface GoldenPage {
 }
 
 export interface GoldenDataset {
-  schema: "mathlens.golden-dataset.v3";
+  schema: "mathcraft.golden-dataset.v3";
   dataset_id: string;
   source: { filename: string; sha256: string };
   source_page_count: number;

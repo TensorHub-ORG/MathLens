@@ -8,7 +8,7 @@ from pathlib import Path
 import pymupdf
 import pytest
 
-from mathlens.domain import (
+from mathcraft.domain import (
     Block,
     BlockType,
     BoundingBox,
@@ -19,15 +19,15 @@ from mathlens.domain import (
     Page,
     SourceDocument,
 )
-from mathlens.golden import (
+from mathcraft.golden import (
     GoldenBlock,
     GoldenDataset,
     GoldenPage,
     ReviewAspect,
     SuggestionSource,
 )
-from mathlens.studio import GoldenWorkspace, WorkspaceConflictError
-from mathlens.studio.server import StudioServer
+from mathcraft.studio import GoldenWorkspace, WorkspaceConflictError
+from mathcraft.studio.server import StudioServer
 
 SOURCE_HASH = "a" * 64
 ARTIFACT_ID = "b" * 64

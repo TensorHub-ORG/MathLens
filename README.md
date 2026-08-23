@@ -1,11 +1,21 @@
-# MathLens
+# TensorHub MathCraft
 
-MathLens 是一个面向数学信息载体的开放、可验证、可扩展的智能处理与推理平台。PDF 是首个
+**MathCraft（数理工坊）**是 TensorHub 旗下一个面向数学信息载体的开放、可验证、可扩展的
+智能处理与推理平台。PDF 是首个
 输入形式，MathIR 才是连接解析、推理、验证、知识与输出能力的长期核心协议。
 
-当前仓库首先建设稳定的 `MathLens Core`：把扫描 PDF 和图片转换为具有来源坐标、
+当前仓库首先建设稳定的 `MathCraft Core`：把扫描 PDF 和图片转换为具有来源坐标、
 候选结果与完整溯源信息的 MathIR，并为 OCR、LaTeX 重构、文档结构理解和质量评测
 提供可靠基础。Agent、形式化验证和翻译等高级能力将在核心稳定后以 Skill 形式接入。
+
+```text
+TensorHub MathCraft
+├── MathCraft Core
+├── MathCraft Flow
+├── MathCraft Studio
+├── MathCraft Skills
+└── MathIR
+```
 
 ## M1 实际成果
 
@@ -13,7 +23,7 @@ MathLens 是一个面向数学信息载体的开放、可验证、可扩展的�
 复核与可复现评测的完整闭环。Golden Annotation Workbench 支持页面与阅读顺序校验、
 原图裁剪、KaTeX 公式对照、风险队列和稳定文本抽样。
 
-![MathLens Golden Annotation Workbench](docs/assets/golden-workbench.png)
+![MathCraft Golden Annotation Workbench](docs/assets/golden-workbench.png)
 
 首份基线的适用范围、指标和辅助标注限制见
 [MinerU 3.4.5 M1 解析基线](docs/baselines/mineru-3.4.5-m1.md)。
@@ -63,19 +73,19 @@ irm https://astral.sh/uv/install.ps1 | iex
 检查本地运行环境：
 
 ```powershell
-.tools\uv run mathlens doctor
+.tools\uv run mathcraft doctor
 ```
 
 探测扫描或矢量 PDF：
 
 ```powershell
-.tools\uv run mathlens inspect "path\to\document.pdf" --max-pages 10
+.tools\uv run mathcraft inspect "path\to\document.pdf" --max-pages 10
 ```
 
 将指定页面以 300 DPI 渲染为不可变 artifact：
 
 ```powershell
-.tools\uv run mathlens render "path\to\document.pdf" --page 1 --page 4 --output-dir artifacts
+.tools\uv run mathcraft render "path\to\document.pdf" --page 1 --page 4 --output-dir artifacts
 ```
 
 每个页面写入以 artifact ID 寻址的独立目录，其中包含 `page.png` 和 `manifest.json`。
@@ -85,7 +95,7 @@ manifest 记录源文件哈希、页码、DPI、像素尺寸、PDF 点坐标到�
 运行 JSONL golden dataset 评测：
 
 ```powershell
-.tools\uv run mathlens evaluate tests\fixtures\evaluation.jsonl
+.tools\uv run mathcraft evaluate tests\fixtures\evaluation.jsonl
 ```
 
 评测数据每行格式如下：
@@ -97,10 +107,10 @@ manifest 记录源文件哈希、页码、DPI、像素尺寸、PDF 点坐标到�
 ## 开发检查
 
 ```powershell
-.tools\uv run pytest --cov=mathlens --cov-report=term-missing
+.tools\uv run pytest --cov=mathcraft --cov-report=term-missing
 .tools\uv run ruff check .
 .tools\uv run ruff format --check .
-.tools\uv run mypy -p mathlens
+.tools\uv run mypy -p mathcraft
 ```
 
 运行产物放在 `artifacts/` 或 `workspace/`，两者均不进入版本控制。不要把原始 PDF、
@@ -116,9 +126,9 @@ npm ci
 npm run build
 cd ..
 
-.tools\uv run mathlens golden-studio workspace\golden\reference.json `
+.tools\uv run mathcraft golden-studio workspace\golden\reference.json `
   --artifact-dir workspace\golden\artifacts `
-  --prediction workspace\mineru-page-7-retry\mathlens-parse-result.json
+  --prediction workspace\mineru-page-7-retry\mathcraft-parse-result.json
 ```
 
 浏览器打开 `http://127.0.0.1:8765`。完整标注规则和复核门禁见
@@ -134,7 +144,7 @@ npm run test:e2e
 
 ## 许可证
 
-MathLens 采用双重授权：
+MathCraft 采用双重授权：
 
 - [GNU Affero General Public License v3.0 only](LICENSE)；或
 - 由版权所有者张国人（Guoren Zhang）单独书面授予的[商业许可证](COMMERCIAL-LICENSE.md)。

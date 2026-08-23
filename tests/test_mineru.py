@@ -5,13 +5,13 @@ from shutil import copyfile
 import pymupdf
 import pytest
 
-from mathlens.adapters.mineru import (
+from mathcraft.adapters.mineru import (
     MinerUCLIAdapter,
     MinerUDevice,
     MinerURuntimeInfo,
     import_content_list_v2,
 )
-from mathlens.domain import BlockType, CoordinateSpace, DiagnosticLevel
+from mathcraft.domain import BlockType, CoordinateSpace, DiagnosticLevel
 
 
 def _create_source(path: Path) -> None:
@@ -89,12 +89,12 @@ def test_mineru_cli_adapter_runs_one_based_page_range(
         onnxruntime_providers=("CPUExecutionProvider",),
     )
     monkeypatch.setattr(
-        "mathlens.adapters.mineru.cli.resolve_mineru_executable", lambda _: "mineru.exe"
+        "mathcraft.adapters.mineru.cli.resolve_mineru_executable", lambda _: "mineru.exe"
     )
     monkeypatch.setattr(
-        "mathlens.adapters.mineru.cli.probe_mineru_runtime", lambda *_, **__: runtime
+        "mathcraft.adapters.mineru.cli.probe_mineru_runtime", lambda *_, **__: runtime
     )
-    monkeypatch.setattr("mathlens.adapters.mineru.cli.run_managed_process", fake_run)
+    monkeypatch.setattr("mathcraft.adapters.mineru.cli.run_managed_process", fake_run)
 
     result = MinerUCLIAdapter().parse(source, output, start_page=7, end_page=7)
 
@@ -126,7 +126,7 @@ def test_mineru_cli_adapter_requires_installed_executable(
     def missing(_: str) -> str:
         raise FileNotFoundError("separate runtime")
 
-    monkeypatch.setattr("mathlens.adapters.mineru.cli.resolve_mineru_executable", missing)
+    monkeypatch.setattr("mathcraft.adapters.mineru.cli.resolve_mineru_executable", missing)
 
     with pytest.raises(FileNotFoundError, match="separate runtime"):
         MinerUCLIAdapter().parse(source, tmp_path / "output")
@@ -151,10 +151,10 @@ def test_mineru_cli_adapter_rejects_unavailable_requested_cuda(
         onnxruntime_providers=("CPUExecutionProvider",),
     )
     monkeypatch.setattr(
-        "mathlens.adapters.mineru.cli.resolve_mineru_executable", lambda _: "mineru.exe"
+        "mathcraft.adapters.mineru.cli.resolve_mineru_executable", lambda _: "mineru.exe"
     )
     monkeypatch.setattr(
-        "mathlens.adapters.mineru.cli.probe_mineru_runtime", lambda *_, **__: runtime
+        "mathcraft.adapters.mineru.cli.probe_mineru_runtime", lambda *_, **__: runtime
     )
 
     with pytest.raises(RuntimeError, match="CUDA was requested"):

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from mathlens.adapters.mineru.managed_process import run_managed_process
+from mathcraft.adapters.mineru.managed_process import run_managed_process
 
 
 def _process_is_active(process_id: int) -> bool:

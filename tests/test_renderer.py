@@ -3,7 +3,7 @@ from pathlib import Path
 import pymupdf
 import pytest
 
-from mathlens.adapters.pymupdf import PyMuPDFPageRenderer
+from mathcraft.adapters.pymupdf import PyMuPDFPageRenderer
 
 
 def _create_pdf(path: Path, page_count: int = 1) -> None:

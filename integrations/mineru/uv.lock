@@ -630,7 +630,7 @@ wheels = [
 ]
 
 [[package]]
-name = "mathlens-mineru-runtime"
+name = "mathcraft-mineru-runtime"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
